@@ -1,0 +1,1152 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no, maximum-scale=1">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="폴라로이드 보드">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#232731">
+<title>냉장고 자석 & 폴라로이드 보드</title>
+<link href="https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&family=Nanum+Pen+Script&family=Noto+Sans+KR:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg-metal: #232731;
+  --board-grid: rgba(255, 255, 255, 0.035);
+  --paper-cream: #fcfaf5;
+  --paper-shadow: 0 12px 28px rgba(0,0,0,0.4), 0 2px 6px rgba(0,0,0,0.22);
+  --font-hand: 'Nanum Pen Script', 'Gaegu', cursive;
+  --font-ui: 'Noto Sans KR', -apple-system, sans-serif;
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background-color: var(--bg-metal);
+  font-family: var(--font-ui);
+}
+
+/* 냉장고 도어 메탈 질감 */
+#board {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  touch-action: none;
+  background: 
+    radial-gradient(ellipse at 50% 25%, #383e4d 0%, #191c24 85%),
+    repeating-linear-gradient(45deg, var(--board-grid) 0, var(--board-grid) 2px, transparent 0, transparent 36px);
+  box-shadow: inset 0 0 130px rgba(0,0,0,0.65);
+}
+
+/* 빈 보드 안내 */
+#emptyHint {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  color: rgba(255, 255, 255, 0.4);
+  pointer-events: none;
+  transition: opacity 0.3s;
+  width: 85%;
+}
+#emptyHint .icon { font-size: 54px; margin-bottom: 10px; }
+#emptyHint p { margin: 4px 0; font-size: 15px; font-weight: 500; }
+
+/* 상단 헤더 */
+header {
+  position: absolute;
+  top: calc(10px + var(--safe-top));
+  left: 14px;
+  right: 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 9999;
+  pointer-events: none;
+}
+header * { pointer-events: auto; }
+
+.board-title-box {
+  background: rgba(18, 21, 28, 0.78);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  padding: 6px 14px;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.3);
+}
+.board-title-box .badge {
+  font-size: 16px;
+}
+.board-title-box .name {
+  color: #fff;
+  font-size: 15px;
+  font-weight: 600;
+  max-width: 140px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.board-title-box .count {
+  font-size: 11px;
+  color: #a4b0be;
+  background: rgba(255,255,255,0.12);
+  padding: 2px 7px;
+  border-radius: 10px;
+}
+
+.header-actions {
+  display: flex;
+  gap: 6px;
+}
+.header-btn {
+  background: rgba(255,255,255,0.14);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255,255,255,0.2);
+  color: #fff;
+  border-radius: 20px;
+  padding: 7px 12px;
+  font-size: 13px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  transition: all 0.18s;
+}
+.header-btn:active {
+  transform: scale(0.93);
+  background: rgba(255,255,255,0.26);
+}
+
+/* 하단 툴바 */
+.toolbar {
+  position: absolute;
+  bottom: calc(18px + var(--safe-bottom));
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(18, 22, 30, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  padding: 8px 16px;
+  border-radius: 40px;
+  box-shadow: 0 16px 36px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.14);
+  z-index: 9999;
+}
+
+.tool-btn {
+  border: none;
+  background: transparent;
+  color: #ced6e0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  font-size: 11px;
+  cursor: pointer;
+  padding: 6px 9px;
+  border-radius: 14px;
+  transition: all 0.18s;
+}
+.tool-btn .ico { font-size: 20px; }
+.tool-btn:active {
+  transform: scale(0.9);
+  color: #fff;
+}
+.tool-btn.primary {
+  background: #ff4757;
+  color: #fff;
+  padding: 8px 16px;
+  border-radius: 26px;
+  font-weight: 600;
+  box-shadow: 0 6px 16px rgba(255, 71, 87, 0.4);
+}
+.tool-btn.primary:active {
+  transform: scale(0.93);
+  background: #ff6b81;
+}
+
+/* 폴라로이드 카드 아이템 */
+.board-item {
+  position: absolute;
+  cursor: grab;
+  touch-action: none;
+  will-change: transform;
+}
+.board-item:active {
+  cursor: grabbing;
+}
+
+.polaroid-card {
+  width: 220px;
+  background: var(--paper-cream);
+  padding: 12px 12px 18px 12px;
+  border-radius: 4px;
+  box-shadow: var(--paper-shadow);
+  position: relative;
+  transition: box-shadow 0.2s;
+}
+.board-item.dragging .polaroid-card {
+  box-shadow: 0 24px 44px rgba(0,0,0,0.55), 0 4px 14px rgba(0,0,0,0.3);
+}
+
+.photo-frame {
+  width: 100%;
+  aspect-ratio: 1/1;
+  background: #15181e;
+  overflow: hidden;
+  border-radius: 2px;
+  box-shadow: inset 0 0 6px rgba(0,0,0,0.4);
+}
+.photo-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  pointer-events: none;
+  filter: contrast(106%) saturate(108%) sepia(8%);
+}
+
+.caption-area {
+  margin-top: 10px;
+  min-height: 36px;
+  text-align: center;
+  font-family: var(--font-hand);
+  font-size: 24px;
+  color: #2f3542;
+  line-height: 1.15;
+  cursor: text;
+  word-break: break-all;
+  user-select: text;
+  -webkit-user-select: text;
+  outline: none;
+}
+.caption-area:empty:before {
+  content: '탭해서 메모 쓰기...';
+  color: #a4b0be;
+  font-size: 20px;
+}
+
+/* 상단 핀 / 자석 */
+.magnet-head {
+  position: absolute;
+  top: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  z-index: 5;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 스티커 아이템 */
+.sticker-item {
+  width: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 42px;
+  filter: drop-shadow(0 6px 12px rgba(0,0,0,0.4));
+}
+
+/* 카드 상단 조작 버튼들 */
+.item-actions {
+  position: absolute;
+  top: -46px;
+  right: -6px;
+  background: rgba(18, 22, 30, 0.92);
+  backdrop-filter: blur(8px);
+  border-radius: 20px;
+  display: none;
+  gap: 6px;
+  padding: 4px 8px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.45);
+  z-index: 100;
+}
+.board-item.selected .item-actions {
+  display: flex;
+}
+.action-btn {
+  background: none;
+  border: none;
+  color: #ced6e0;
+  font-size: 17px;
+  padding: 4px 8px;
+  cursor: pointer;
+  border-radius: 12px;
+}
+.action-btn:active {
+  background: rgba(255,255,255,0.22);
+  color: #fff;
+}
+.action-btn.del { color: #ff6b81; }
+
+/* 공통 바텀시트 모달 스타일 */
+.sheet-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.68);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 10000;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.24s ease;
+}
+.sheet-modal.open {
+  opacity: 1;
+  pointer-events: auto;
+}
+.sheet-content {
+  background: #1c202a;
+  border-top-left-radius: 24px;
+  border-top-right-radius: 24px;
+  padding: 20px 20px calc(24px + var(--safe-bottom));
+  transform: translateY(100%);
+  transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 -12px 32px rgba(0,0,0,0.55);
+  max-height: 82vh;
+  display: flex;
+  flex-direction: column;
+}
+.sheet-modal.open .sheet-content {
+  transform: translateY(0);
+}
+.sheet-header {
+  color: #f1f2f6;
+  font-size: 17px;
+  font-weight: 600;
+  margin-bottom: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.sheet-close {
+  background: #2b303d;
+  border: none;
+  color: #ced6e0;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+/* 여행 앨범 리스트 UI */
+.album-list {
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 4px 0 12px;
+}
+.album-card {
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 14px;
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.album-card.active {
+  border-color: #ff4757;
+  background: rgba(255, 71, 87, 0.12);
+}
+.album-card:active {
+  transform: scale(0.98);
+}
+.album-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.album-name {
+  color: #fff;
+  font-size: 16px;
+  font-weight: 600;
+}
+.album-meta {
+  color: #8395a7;
+  font-size: 12px;
+}
+.album-del-btn {
+  background: none;
+  border: none;
+  color: #747d8c;
+  font-size: 18px;
+  padding: 6px 10px;
+  cursor: pointer;
+}
+.album-del-btn:active {
+  color: #ff6b81;
+}
+
+.album-bottom-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 14px;
+}
+.btn-save-as {
+  flex: 1;
+  background: #ff4757;
+  color: #fff;
+  border: none;
+  border-radius: 14px;
+  padding: 12px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.btn-new-album {
+  flex: 1;
+  background: #2f3542;
+  color: #fff;
+  border: none;
+  border-radius: 14px;
+  padding: 12px;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+/* 스티커 그리드 */
+.sticker-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 12px;
+  max-height: 46vh;
+  overflow-y: auto;
+  padding: 6px 0;
+}
+.sticker-opt {
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 16px;
+  padding: 12px 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+  cursor: pointer;
+  transition: all 0.16s;
+}
+.sticker-opt:active {
+  transform: scale(0.88);
+  background: rgba(255,255,255,0.18);
+}
+
+/* 플래시 효과 */
+#flashOverlay {
+  position: fixed;
+  inset: 0;
+  background: #fff;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 99999;
+  transition: opacity 0.4s ease-out;
+}
+#flashOverlay.flash {
+  opacity: 0.95;
+  transition: none;
+}
+</style>
+</head>
+<body>
+
+<div id="flashOverlay"></div>
+
+<header>
+  <div class="board-title-box" id="btnOpenAlbum">
+    <span class="badge">✈️</span>
+    <span class="name" id="currentAlbumName">나의 여행 보드</span>
+    <span class="count" id="currentPhotoCount">0장</span>
+  </div>
+  <div class="header-actions">
+    <button class="header-btn" id="btnSaveCurrent">💾 저장</button>
+    <button class="header-btn" id="btnAudioToggle">🔊 소리</button>
+  </div>
+</header>
+
+<div id="board">
+  <div id="emptyHint">
+    <div class="icon">📷</div>
+    <p>아래 <b>+ 사진 추가</b> 버튼을 눌러</p>
+    <p>냉장고에 사진을 붙이고 리스트로 저장해 보세요!</p>
+  </div>
+</div>
+
+<div class="toolbar">
+  <input type="file" id="fileInput" accept="image/*" multiple style="display:none">
+  <button class="tool-btn primary" id="btnAddPhoto">
+    <span class="ico">📸</span>
+    <span>+ 사진 추가</span>
+  </button>
+  <button class="tool-btn" id="btnAddSticker">
+    <span class="ico">✨</span>
+    <span>자석/스티커</span>
+  </button>
+  <button class="tool-btn" id="btnShuffle">
+    <span class="ico">🎲</span>
+    <span>재배치</span>
+  </button>
+</div>
+
+<!-- 앨범 목록/저장 모달 -->
+<div class="sheet-modal" id="albumSheet">
+  <div class="sheet-content">
+    <div class="sheet-header">
+      <span>내 여행 보드 리스트</span>
+      <button class="sheet-close" id="btnCloseAlbumSheet">✕</button>
+    </div>
+    <div class="album-list" id="albumList"></div>
+    <div class="album-bottom-actions">
+      <button class="btn-save-as" id="btnSaveAsNew">현재 보드 새 이름으로 저장</button>
+      <button class="btn-new-album" id="btnCreateBlank">새 보드 만들기</button>
+    </div>
+  </div>
+</div>
+
+<!-- 자석/스티커 모달 -->
+<div class="sheet-modal" id="stickerSheet">
+  <div class="sheet-content">
+    <div class="sheet-header">
+      <span>보드에 붙일 자석 / 스티커 선택</span>
+      <button class="sheet-close" id="btnCloseStickerSheet">✕</button>
+    </div>
+    <div class="sticker-grid" id="stickerGrid"></div>
+  </div>
+</div>
+
+<script>
+// ==========================================
+// 1. 내장 오디오 신디사이저 (효과음)
+// ==========================================
+let audioCtx = null;
+let soundEnabled = true;
+
+function initAudio() {
+  if (!audioCtx) {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  }
+  if (audioCtx.state === 'suspended') {
+    audioCtx.resume();
+  }
+}
+
+function playShutterSound() {
+  if (!soundEnabled) return;
+  initAudio();
+  const now = audioCtx.currentTime;
+  const bufferSize = audioCtx.sampleRate * 0.08;
+  const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+  const data = buffer.getChannelData(0);
+  for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
+  const noise = audioCtx.createBufferSource();
+  noise.buffer = buffer;
+  const noiseGain = audioCtx.createGain();
+  noiseGain.gain.setValueAtTime(0.6, now);
+  noiseGain.gain.exponentialRampToValueAtTime(0.01, now + 0.08);
+  noise.connect(noiseGain);
+  noiseGain.connect(audioCtx.destination);
+  noise.start(now);
+
+  const osc = audioCtx.createOscillator();
+  const oscGain = audioCtx.createGain();
+  osc.type = 'sawtooth';
+  osc.frequency.setValueAtTime(130, now + 0.1);
+  osc.frequency.linearRampToValueAtTime(70, now + 0.42);
+  oscGain.gain.setValueAtTime(0.12, now + 0.1);
+  oscGain.gain.linearRampToValueAtTime(0.01, now + 0.42);
+  osc.connect(oscGain);
+  oscGain.connect(audioCtx.destination);
+  osc.start(now + 0.1);
+  osc.stop(now + 0.42);
+}
+
+function playThudSound() {
+  if (!soundEnabled) return;
+  initAudio();
+  const now = audioCtx.currentTime;
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+  osc.type = 'sine';
+  osc.frequency.setValueAtTime(260, now);
+  osc.frequency.exponentialRampToValueAtTime(50, now + 0.06);
+  gain.gain.setValueAtTime(0.35, now);
+  gain.gain.exponentialRampToValueAtTime(0.01, now + 0.06);
+  osc.connect(gain);
+  gain.connect(audioCtx.destination);
+  osc.start(now);
+  osc.stop(now + 0.06);
+}
+
+// ==========================================
+// 2. IndexedDB (앨범 & 보드 아이템 복수 관리)
+// ==========================================
+const DB_NAME = 'PolaroidTravelDB';
+const DB_VERSION = 1;
+let db = null;
+
+function openDB() {
+  return new Promise((resolve, reject) => {
+    const req = indexedDB.open(DB_NAME, DB_VERSION);
+    req.onupgradeneeded = e => {
+      const d = e.target.result;
+      if (!d.objectStoreNames.contains('albums')) {
+        d.createObjectStore('albums', { keyPath: 'id' });
+      }
+    };
+    req.onsuccess = e => {
+      db = e.target.result;
+      resolve(db);
+    };
+    req.onerror = e => reject(e);
+  });
+}
+
+function getAllAlbums() {
+  return new Promise((resolve) => {
+    if (!db) return resolve([]);
+    const tx = db.transaction('albums', 'readonly');
+    const req = tx.objectStore('albums').getAll();
+    req.onsuccess = () => resolve(req.result || []);
+    req.onerror = () => resolve([]);
+  });
+}
+
+function saveAlbum(album) {
+  return new Promise((resolve) => {
+    if (!db) return resolve();
+    const tx = db.transaction('albums', 'readwrite');
+    tx.objectStore('albums').put(album);
+    tx.oncomplete = () => resolve();
+  });
+}
+
+function deleteAlbum(id) {
+  return new Promise((resolve) => {
+    if (!db) return resolve();
+    const tx = db.transaction('albums', 'readwrite');
+    tx.objectStore('albums').delete(id);
+    tx.oncomplete = () => resolve();
+  });
+}
+
+// ==========================================
+// 3. 현재 작업 보드 상태 관리
+// ==========================================
+let currentAlbum = {
+  id: 'album_default',
+  name: '경주 여행 사진',
+  updatedAt: Date.now(),
+  items: []
+};
+let maxZ = 10;
+const MAGNET_COLORS = ['#ff4757', '#2ed573', '#1e90ff', '#ffa502', '#9c88ff', '#ff6b81', '#70a1ff'];
+const STICKER_LIST = ['🧲', '⭐', '❤️', '✈️', '🏝️', '☕', '🌸', '🍕', '🎉', '📌', '🍀', '🏖️', '🌻', '🐾', '🥑'];
+
+const board = document.getElementById('board');
+const emptyHint = document.getElementById('emptyHint');
+const currentAlbumName = document.getElementById('currentAlbumName');
+const currentPhotoCount = document.getElementById('currentPhotoCount');
+
+function updateHeaderInfo() {
+  currentAlbumName.textContent = currentAlbum.name;
+  const photoCount = currentAlbum.items.filter(i => i.type === 'photo').length;
+  currentPhotoCount.textContent = `${photoCount}장`;
+  emptyHint.style.opacity = currentAlbum.items.length === 0 ? '1' : '0';
+}
+
+function flashScreen() {
+  const fl = document.getElementById('flashOverlay');
+  fl.classList.add('flash');
+  requestAnimationFrame(() => requestAnimationFrame(() => fl.classList.remove('flash')));
+}
+
+function renderCurrentBoard() {
+  board.querySelectorAll('.board-item').forEach(el => el.remove());
+  maxZ = 10;
+  currentAlbum.items.forEach(item => {
+    if (item.z && item.z > maxZ) maxZ = item.z;
+    const el = createItemElement(item);
+    board.appendChild(el);
+  });
+  updateHeaderInfo();
+}
+
+// ==========================================
+// 4. 아이템 렌더링 & 드래그 인터랙션
+// ==========================================
+function applyTransform(el, x, y, rot) {
+  el.style.transform = `translate3d(${x}px, ${y}px, 0px) rotate(${rot}deg)`;
+}
+
+function createItemElement(item) {
+  const el = document.createElement('div');
+  el.className = 'board-item';
+  el.id = 'item-' + item.id;
+  el.dataset.id = item.id;
+
+  let x = item.x;
+  let y = item.y;
+  let rot = item.rotation;
+  let z = item.z || ++maxZ;
+  el.style.zIndex = z;
+  applyTransform(el, x, y, rot);
+
+  if (item.type === 'photo') {
+    const magnetColor = item.magnetColor || MAGNET_COLORS[0];
+    el.innerHTML = `
+      <div class="item-actions">
+        <button class="action-btn rot-btn" title="회전">🔄</button>
+        <button class="action-btn top-btn" title="맨앞으로">🔝</button>
+        <button class="action-btn del del-btn" title="삭제">✕</button>
+      </div>
+      <div class="polaroid-card">
+        <div class="magnet-head" style="background:${magnetColor}"></div>
+        <div class="photo-frame">
+          <img class="photo-img" src="${item.src}" alt="photo">
+        </div>
+        <div class="caption-area" contenteditable="true" spellcheck="false">${item.caption || ''}</div>
+      </div>
+    `;
+
+    const cap = el.querySelector('.caption-area');
+    cap.addEventListener('blur', () => {
+      item.caption = cap.innerText.trim();
+      persistCurrentAlbum();
+    });
+    cap.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        cap.blur();
+      }
+    });
+
+  } else {
+    el.innerHTML = `
+      <div class="item-actions">
+        <button class="action-btn rot-btn" title="회전">🔄</button>
+        <button class="action-btn del del-btn" title="삭제">✕</button>
+      </div>
+      <div class="sticker-item">${item.emoji}</div>
+    `;
+  }
+
+  // 액션 버튼
+  el.querySelector('.rot-btn').addEventListener('click', (e) => {
+    e.stopPropagation();
+    rot = (rot + 15) % 360;
+    item.rotation = rot;
+    applyTransform(el, x, y, rot);
+    persistCurrentAlbum();
+    playThudSound();
+  });
+
+  const topBtn = el.querySelector('.top-btn');
+  if (topBtn) {
+    topBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      z = ++maxZ;
+      el.style.zIndex = z;
+      item.z = z;
+      persistCurrentAlbum();
+      playThudSound();
+    });
+  }
+
+  el.querySelector('.del-btn').addEventListener('click', (e) => {
+    e.stopPropagation();
+    currentAlbum.items = currentAlbum.items.filter(i => i.id !== item.id);
+    el.remove();
+    updateHeaderInfo();
+    persistCurrentAlbum();
+  });
+
+  setupDrag(el, item, (nx, ny, nz) => {
+    x = nx; y = ny; z = nz;
+  });
+
+  return el;
+}
+
+function setupDrag(el, item, onMoved) {
+  let isDragging = false;
+  let startX = 0, startY = 0;
+  let itemX = item.x, itemY = item.y;
+  let hasMoved = false;
+
+  el.addEventListener('pointerdown', (e) => {
+    if (e.target.closest('.caption-area') || e.target.closest('.action-btn')) return;
+
+    isDragging = true;
+    hasMoved = false;
+    startX = e.clientX;
+    startY = e.clientY;
+    itemX = item.x;
+    itemY = item.y;
+
+    maxZ += 1;
+    el.style.zIndex = maxZ;
+    item.z = maxZ;
+    el.classList.add('dragging');
+
+    document.querySelectorAll('.board-item.selected').forEach(i => i.classList.remove('selected'));
+    el.classList.add('selected');
+
+    el.setPointerCapture(e.pointerId);
+    playThudSound();
+  });
+
+  el.addEventListener('pointermove', (e) => {
+    if (!isDragging) return;
+    const dx = e.clientX - startX;
+    const dy = e.clientY - startY;
+    if (Math.hypot(dx, dy) > 4) hasMoved = true;
+    applyTransform(el, itemX + dx, itemY + dy, item.rotation);
+  });
+
+  const endDrag = (e) => {
+    if (!isDragging) return;
+    isDragging = false;
+    el.classList.remove('dragging');
+
+    if (hasMoved) {
+      item.x = itemX + (e.clientX - startX);
+      item.y = itemY + (e.clientY - startY);
+      onMoved(item.x, item.y, item.z);
+      persistCurrentAlbum();
+    }
+  };
+
+  el.addEventListener('pointerup', endDrag);
+  el.addEventListener('pointercancel', endDrag);
+}
+
+board.addEventListener('pointerdown', (e) => {
+  if (e.target === board || e.target === emptyHint) {
+    document.querySelectorAll('.board-item.selected').forEach(i => i.classList.remove('selected'));
+  }
+});
+
+// ==========================================
+// 5. 사진 업로드 & 압축
+// ==========================================
+const fileInput = document.getElementById('fileInput');
+document.getElementById('btnAddPhoto').addEventListener('click', () => {
+  initAudio();
+  fileInput.click();
+});
+
+fileInput.addEventListener('change', async (e) => {
+  const files = Array.from(e.target.files);
+  if (!files.length) return;
+
+  flashScreen();
+  playShutterSound();
+
+  const boardRect = board.getBoundingClientRect();
+  const centerX = Math.max(10, (boardRect.width - 230) / 2);
+  const centerY = Math.max(30, (boardRect.height - 310) / 2);
+
+  for (let i = 0; i < files.length; i++) {
+    const file = files[i];
+    const dataUrl = await readFileAndResize(file);
+    const offsetX = centerX + (Math.random() * 40 - 20) + (i * 12);
+    const offsetY = centerY + (Math.random() * 40 - 20) + (i * 12);
+    const rotation = Math.floor(Math.random() * 24 - 12);
+
+    const newItem = {
+      id: 'p_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5),
+      type: 'photo',
+      src: dataUrl,
+      caption: '',
+      x: offsetX,
+      y: offsetY,
+      rotation: rotation,
+      z: ++maxZ,
+      magnetColor: MAGNET_COLORS[Math.floor(Math.random() * MAGNET_COLORS.length)]
+    };
+
+    currentAlbum.items.push(newItem);
+    board.appendChild(createItemElement(newItem));
+  }
+
+  updateHeaderInfo();
+  persistCurrentAlbum();
+  fileInput.value = '';
+});
+
+function readFileAndResize(file) {
+  return new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      const img = new Image();
+      img.onload = () => {
+        const maxDim = 1200;
+        let w = img.width, h = img.height;
+        if (w > maxDim || h > maxDim) {
+          if (w > h) { h = (h * maxDim) / w; w = maxDim; }
+          else { w = (w * maxDim) / h; h = maxDim; }
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = w; canvas.height = h;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, w, h);
+        resolve(canvas.toDataURL('image/jpeg', 0.85));
+      };
+      img.src = ev.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+// 스티커 추가
+const stickerSheet = document.getElementById('stickerSheet');
+const stickerGrid = document.getElementById('stickerGrid');
+
+STICKER_LIST.forEach(emoji => {
+  const opt = document.createElement('div');
+  opt.className = 'sticker-opt';
+  opt.textContent = emoji;
+  opt.addEventListener('click', () => {
+    addStickerToBoard(emoji);
+    stickerSheet.classList.remove('open');
+  });
+  stickerGrid.appendChild(opt);
+});
+
+document.getElementById('btnAddSticker').addEventListener('click', () => {
+  initAudio();
+  stickerSheet.classList.add('open');
+});
+document.getElementById('btnCloseStickerSheet').addEventListener('click', () => {
+  stickerSheet.classList.remove('open');
+});
+
+function addStickerToBoard(emoji) {
+  const boardRect = board.getBoundingClientRect();
+  const newItem = {
+    id: 's_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5),
+    type: 'sticker',
+    emoji: emoji,
+    x: (boardRect.width / 2) - 30 + (Math.random() * 40 - 20),
+    y: (boardRect.height / 2) - 30 + (Math.random() * 40 - 20),
+    rotation: Math.floor(Math.random() * 30 - 15),
+    z: ++maxZ
+  };
+  currentAlbum.items.push(newItem);
+  board.appendChild(createItemElement(newItem));
+  updateHeaderInfo();
+  persistCurrentAlbum();
+  playThudSound();
+}
+
+// 셔플 재배치
+document.getElementById('btnShuffle').addEventListener('click', () => {
+  if (!currentAlbum.items.length) return;
+  initAudio();
+  const boardRect = board.getBoundingClientRect();
+  currentAlbum.items.forEach(item => {
+    const el = document.getElementById('item-' + item.id);
+    if (!el) return;
+    const maxX = Math.max(10, boardRect.width - 230);
+    const maxY = Math.max(40, boardRect.height - 310);
+    item.x = Math.floor(Math.random() * maxX);
+    item.y = Math.floor(Math.random() * (maxY - 60)) + 40;
+    item.rotation = Math.floor(Math.random() * 26 - 13);
+    applyTransform(el, item.x, item.y, item.rotation);
+  });
+  persistCurrentAlbum();
+  playThudSound();
+});
+
+// ==========================================
+// 6. 여행 앨범 목록 관리 및 저장 기능
+// ==========================================
+const albumSheet = document.getElementById('albumSheet');
+const albumList = document.getElementById('albumList');
+
+function persistCurrentAlbum() {
+  currentAlbum.updatedAt = Date.now();
+  saveAlbum(currentAlbum);
+  localStorage.setItem('lastAlbumId', currentAlbum.id);
+}
+
+document.getElementById('btnSaveCurrent').addEventListener('click', () => {
+  persistCurrentAlbum();
+  playThudSound();
+  alert(`'${currentAlbum.name}' 보드가 안전하게 저장되었습니다.`);
+});
+
+document.getElementById('btnOpenAlbum').addEventListener('click', async () => {
+  initAudio();
+  await refreshAlbumListView();
+  albumSheet.classList.add('open');
+});
+document.getElementById('btnCloseAlbumSheet').addEventListener('click', () => {
+  albumSheet.classList.remove('open');
+});
+
+async function refreshAlbumListView() {
+  albumList.innerHTML = '';
+  const albums = await getAllAlbums();
+
+  if (!albums.length) {
+    albumList.innerHTML = '<div style="color:#747d8c; text-align:center; padding:20px;">저장된 여행 리스트가 없습니다.</div>';
+    return;
+  }
+
+  // 최신 수정순
+  albums.sort((a,b) => (b.updatedAt || 0) - (a.updatedAt || 0));
+
+  albums.forEach(alb => {
+    const card = document.createElement('div');
+    card.className = 'album-card' + (alb.id === currentAlbum.id ? ' active' : '');
+
+    const pCount = (alb.items || []).filter(i => i.type === 'photo').length;
+    const dateStr = new Date(alb.updatedAt || Date.now()).toLocaleDateString('ko-KR', { month:'short', day:'numeric' });
+
+    card.innerHTML = `
+      <div class="album-info">
+        <div class="album-name">${alb.name}</div>
+        <div class="album-meta">사진 ${pCount}장 · ${dateStr}</div>
+      </div>
+      <button class="album-del-btn" title="삭제">🗑️</button>
+    `;
+
+    // 앨범 선택 불러오기
+    card.addEventListener('click', (e) => {
+      if (e.target.closest('.album-del-btn')) return;
+      currentAlbum = alb;
+      renderCurrentBoard();
+      localStorage.setItem('lastAlbumId', alb.id);
+      albumSheet.classList.remove('open');
+      playThudSound();
+    });
+
+    // 앨범 삭제
+    card.querySelector('.album-del-btn').addEventListener('click', async (e) => {
+      e.stopPropagation();
+      if (!confirm(`'${alb.name}' 여행 보드를 삭제할까요?`)) return;
+      await deleteAlbum(alb.id);
+      if (currentAlbum.id === alb.id) {
+        currentAlbum = {
+          id: 'album_' + Date.now(),
+          name: '새 여행 보드',
+          updatedAt: Date.now(),
+          items: []
+        };
+        renderCurrentBoard();
+        persistCurrentAlbum();
+      }
+      refreshAlbumListView();
+    });
+
+    albumList.appendChild(card);
+  });
+}
+
+// 현재 보드를 새 이름으로 저장
+document.getElementById('btnSaveAsNew').addEventListener('click', () => {
+  const newName = prompt('저장할 여행 리스트 이름을 입력하세요:', currentAlbum.name);
+  if (!newName || !newName.trim()) return;
+
+  const newId = 'album_' + Date.now();
+  currentAlbum = {
+    id: newId,
+    name: newName.trim(),
+    updatedAt: Date.now(),
+    items: JSON.parse(JSON.stringify(currentAlbum.items))
+  };
+
+  persistCurrentAlbum();
+  renderCurrentBoard();
+  albumSheet.classList.remove('open');
+  alert(`'${currentAlbum.name}'으로 저장되었습니다.`);
+});
+
+// 완전히 새로운 빈 보드 만들기
+document.getElementById('btnCreateBlank').addEventListener('click', () => {
+  const name = prompt('새 여행 보드 이름을 입력하세요:', '새 여행 사진');
+  if (!name || !name.trim()) return;
+
+  currentAlbum = {
+    id: 'album_' + Date.now(),
+    name: name.trim(),
+    updatedAt: Date.now(),
+    items: []
+  };
+
+  persistCurrentAlbum();
+  renderCurrentBoard();
+  albumSheet.classList.remove('open');
+});
+
+// 효과음 토글
+document.getElementById('btnAudioToggle').addEventListener('click', function() {
+  soundEnabled = !soundEnabled;
+  this.textContent = soundEnabled ? '🔊 소리' : '🔈 꺼짐';
+  if (soundEnabled) initAudio();
+});
+
+// ==========================================
+// 7. 앱 시작 초기화
+// ==========================================
+window.addEventListener('DOMContentLoaded', async () => {
+  await openDB();
+  const albums = await getAllAlbums();
+  const lastId = localStorage.getItem('lastAlbumId');
+
+  if (albums.length > 0) {
+    const found = albums.find(a => a.id === lastId);
+    currentAlbum = found || albums[0];
+  } else {
+    // 최초 실행 시 기본 보드 생성
+    currentAlbum = {
+      id: 'album_initial',
+      name: '경주 여행 사진',
+      updatedAt: Date.now(),
+      items: []
+    };
+    saveAlbum(currentAlbum);
+  }
+
+  renderCurrentBoard();
+});
+</script>
+</body>
+</html>
